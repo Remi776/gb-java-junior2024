@@ -2,6 +2,7 @@ package src.main.java.ru.gb.homework3;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
@@ -47,12 +48,21 @@ public class JDBC {
             insertData(connection);
 //            String age = "55";
 //            System.out.println("Person с возрастом 55: " + selectNamesByAge(connection, age));
-
-//            updateData(connection);
             selectData(connection);
             System.out.println("=".repeat(10));
+
             long id = ThreadLocalRandom.current().nextInt(1, 11);
-            System.out.println(String.format("Department name(personId = %s): '%s'", id, getDepartmentNameByPersonId(connection, id)));
+            System.out.printf("Department name(personId = %s): '%s'%n", id, getDepartmentNameByPersonId(connection, id));
+            System.out.println("=".repeat(10));
+
+            getPersonDepartmentMap(connection)
+                    .forEach((person, department) -> System.out.println(person + " -> " + department));
+
+            System.out.println("=".repeat(10));
+
+            getDepartmentPersonsMap(connection)
+                    .forEach((person, department) -> System.out.println(person + " -> " + department));
+
         } catch (SQLException e) {
             System.err.println("Во время подключения произошла ошибка: " + e.getMessage());
         }
@@ -197,17 +207,46 @@ public class JDBC {
     /**
      * Пункт 5
      */
-    private static Map<String, String> getPersonDepartments(Connection connection) throws SQLException {
-        // FIXME: Ваш код тут
-        throw new UnsupportedOperationException();
+    private static Map<String, String> getPersonDepartmentMap(Connection connection) throws SQLException {
+
+        String query = """
+                select p.name as p_name, d.name as d_name from department d
+                join person p on d.id = p.department_id
+                """;
+        Map<String, String> map = new HashMap<>();
+
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                map.put(resultSet.getString("p_name"), resultSet.getString("d_name"));
+            }
+            return map;
+        }
     }
 
     /**
      * Пункт 6
      */
-    private static Map<String, List<String>> getDepartmentPersons(Connection connection) throws SQLException {
-        // FIXME: Ваш код тут
-        throw new UnsupportedOperationException();
+    private static Map<String, List<String>> getDepartmentPersonsMap(Connection connection) throws SQLException {
+//        * [
+//     * {"department #1", ["person #1", "person #2"]},
+//     * {"department #2", ["person #3", "person #4"]}
+//     * ]
+        String query = """
+                select d.name as d_name, p.name as p_name from department d
+                join person p on d.id = p.department_id
+                """;
+        Map<String, List<String>> map = new HashMap<>();
+
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                String departmentName = resultSet.getString("d_name");
+                String personName = resultSet.getString("p_name");
+                map.computeIfAbsent(departmentName, k -> new ArrayList<>()).add(personName);
+            }
+            return map;
+        }
     }
 
 }
