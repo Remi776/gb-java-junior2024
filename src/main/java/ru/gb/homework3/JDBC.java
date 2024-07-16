@@ -7,6 +7,9 @@ import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class JDBC {
+
+    private static StringBuilder insertQueryPerson;
+
     /**
      * С помощью JDBC, выполнить следующие пункты:
      * 1. Создать таблицу Person (скопировать код с семниара)
@@ -40,29 +43,23 @@ public class JDBC {
 
         // jdbc:postgres:user@password:host:port///
         try (Connection connection = DriverManager.getConnection("jdbc:h2:mem:test")) {
-            createTables(connection);
+            createTable(connection);
             insertData(connection);
-            String age = "55";
-            System.out.println("Person с возрастом 55: " + selectNamesByAge(connection, age));
+//            String age = "55";
+//            System.out.println("Person с возрастом 55: " + selectNamesByAge(connection, age));
 
-            updateData(connection);
+//            updateData(connection);
             selectData(connection);
+            System.out.println("=".repeat(10));
+            long id = ThreadLocalRandom.current().nextInt(1, 11);
+            System.out.println(String.format("Department name(personId = %s): '%s'", id, getDepartmentNameByPersonId(connection, id)));
         } catch (SQLException e) {
             System.err.println("Во время подключения произошла ошибка: " + e.getMessage());
         }
     }
 
-    private static void createTables(Connection connection) throws SQLException {
+    private static void createTable(Connection connection) throws SQLException {
         try (Statement statement = connection.createStatement()) {
-            String createPersonTable = """
-                    create table person (
-                      id bigint primary key,
-                      name varchar(256),
-                      age integer,
-                      active boolean,
-                      department_id bigint
-                    )
-                    """;
 
             String createDepartmentTable = """
                     create table department (
@@ -71,17 +68,19 @@ public class JDBC {
                     )
                     """;
 
-            statement.executeUpdate(createPersonTable);
-            statement.executeUpdate(createDepartmentTable);
-
-            String addForeignKeyConstraint = """
-                    alter table person
-                    add constraint fk_department
-                    foreign key (department_id)
-                    references department(id)
+            String createPersonTable = """
+                    create table person (
+                      id bigint primary key,
+                      name varchar(256),
+                      age integer,
+                      active boolean,
+                      department_id bigint,
+                      foreign key (department_id) references department(id)
+                    )
                     """;
 
-            statement.executeUpdate(addForeignKeyConstraint);
+            statement.executeUpdate(createDepartmentTable);
+            statement.executeUpdate(createPersonTable);
 
         } catch (SQLException e) {
             System.err.println("Во время создания таблицы произошла ошибка: " + e.getMessage());
@@ -91,32 +90,74 @@ public class JDBC {
 
     private static void insertData(Connection connection) throws SQLException {
         try (Statement statement = connection.createStatement()) {
-            StringBuilder insertQuery = new StringBuilder("insert into person(id, name, age, active) values\n");
+
+            StringBuilder insertQueryDepartment = new StringBuilder("insert into department(id, name) values\n");
+            for (int i = 1; i <= 5; i++) {
+                insertQueryDepartment.append(String.format("(%s, '%s')", i, "Department #" + i));
+
+                if (i != 5) {
+                    insertQueryDepartment.append(",\n");
+                }
+            }
+            statement.executeUpdate(insertQueryDepartment.toString());
+
+            StringBuilder insertQueryPerson = new StringBuilder("insert into person(id, name, age, active, department_id) values\n");
             for (int i = 1; i <= 10; i++) {
                 int age = ThreadLocalRandom.current().nextInt(20, 60);
                 boolean active = ThreadLocalRandom.current().nextBoolean();
-                insertQuery.append(String.format("(%s, '%s', %s, %s)", i, "Person #" + i, age, active));
+                int department_id = ThreadLocalRandom.current().nextInt(1, 6);
+                insertQueryPerson.append(String.format("(%s, '%s', %s, %s, %s)", i, "Person #" + i, age, active, department_id));
 
                 if (i != 10) {
-                    insertQuery.append(",\n");
+                    insertQueryPerson.append(",\n");
                 }
             }
-
-            int insertCount = statement.executeUpdate(insertQuery.toString());
-            System.out.println("Вставлено строк: " + insertCount);
+            statement.executeUpdate(insertQueryPerson.toString());
         }
     }
 
-    private static void updateData(Connection connection) throws SQLException {
-        try (Statement statement = connection.createStatement()) {
-            int updateCount = statement.executeUpdate("update person set active = true where id > 5");
-            System.out.println("Обновлено строк: " + updateCount);
-        }
-    }
+//    private static void updateData(Connection connection) throws SQLException {
+//        try (Statement statement = connection.createStatement()) {
+//            int updateCount = statement.executeUpdate("update person set active = true where id > 5");
+//            System.out.println("Обновлено строк: " + updateCount);
+//        }
+//    }
 
     // static Optional<String> selectNameById(long id) {
     //   ...
     // }
+
+    private static void selectData(Connection connection) throws SQLException {
+        try (Statement statement = connection.createStatement()) {
+            ResultSet resultSet = statement.executeQuery("""
+                    select id, name, age, department_id
+                    from person
+                    """);
+
+            while (resultSet.next()) {
+                long id = resultSet.getLong("id");
+                String name = resultSet.getString("name");
+                int age = resultSet.getInt("age");
+                int department_id = resultSet.getInt("department_id");
+                // persons.add(new Person(id, name, age))
+                System.out.println("Найдена строка: [id = " + id + ", name = " + name + ", age = " + age + ", department_id = " + department_id + "]");
+            }
+
+            System.out.println("=".repeat(10));
+
+            ResultSet resultSetDepartment = statement.executeQuery("""
+                    select id, name
+                    from department
+                    """);
+
+            while (resultSetDepartment.next()) {
+                long id = resultSetDepartment.getLong("id");
+                String name = resultSetDepartment.getString("name");
+                // persons.add(new Person(id, name, age))
+                System.out.println("Найдена строка: [id = " + id + ", name = " + name + "]");
+            }
+        }
+    }
 
     private static List<String> selectNamesByAge(Connection connection, String age) throws SQLException {
 //    try (Statement statement = connection.createStatement()) {
@@ -137,29 +178,20 @@ public class JDBC {
         }
     }
 
-    private static void selectData(Connection connection) throws SQLException {
-        try (Statement statement = connection.createStatement()) {
-            ResultSet resultSet = statement.executeQuery("""
-                    select id, name, age
-                    from person
-                    where active is true""");
-
-            while (resultSet.next()) {
-                long id = resultSet.getLong("id");
-                String name = resultSet.getString("name");
-                int age = resultSet.getInt("age");
-                // persons.add(new Person(id, name, age))
-                System.out.println("Найдена строка: [id = " + id + ", name = " + name + ", age = " + age + "]");
-            }
-        }
-    }
-
     /**
      * Пункт 4
      */
-    private static String getPersonDepartmentName(Connection connection, long personId) throws SQLException {
-        // FIXME: Ваш код тут
-        throw new UnsupportedOperationException();
+    private static String getDepartmentNameByPersonId(Connection connection, long personId) throws SQLException {
+        String query = """
+                select d.name from department d
+                join person p on d.id = p.department_id
+                where p.id = ?
+                """;
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setLong(1, personId);
+            ResultSet resultSet = ps.executeQuery();
+            return resultSet.next() ? resultSet.getString("name") : "Department not found";
+        }
     }
 
     /**
