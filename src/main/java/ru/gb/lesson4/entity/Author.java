@@ -8,6 +8,7 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "author")
 public class Author { // final нельзя
+
     @Id
     @Column(name = "id")
     private Long id;
@@ -15,9 +16,9 @@ public class Author { // final нельзя
     @Column(name = "name")
     private String name;
 
+
 //    public Author(){
 //    }
-
 
     public Long getId() {
         return id;
@@ -33,5 +34,13 @@ public class Author { // final нельзя
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "Author{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
     }
 }

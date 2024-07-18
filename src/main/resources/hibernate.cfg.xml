@@ -5,15 +5,19 @@
 <!-- Version 8 MySQL hibernate-cfg.xml example for Hibernate 5 -->
 <hibernate-configuration>
     <session-factory>
-        <property name="connection.url">jdbc:postgresql://localhost:5432/postgres</property>
-        <property name="connection.driver_class">org.postgresql.Driver</property>
-        <property name="connection.username">postgres</property>
-        <property name="connection.password">pass</property>
-
+        <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/postgres</property>
+        <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
+        <property name="hibernate.connection.username">postgres</property>
+        <property name="hibernate.connection.password">pass</property>
+        <property name="show_sql">true</property>
         <mapping class="ru.gb.lesson4.entity.Author"/>
+        <!-- NONE, CREATE, CREATE-DROP, UPDATE, VALIDATE-->
+        <property name="hibernate.hbm2ddl.auto">
 
-<!--        &lt;!&ndash; property name="connection.driver_class">com.mysql.jdbc.Driver</property &ndash;&gt;-->
-<!--        <property name="dialect">org.hibernate.dialect.MySQL8Dialect</property>-->
+        </property>
+
+
+ <!--        &lt;!&ndash; property name="connection.driver_class">com.mysql.jdbc.Driver</property &ndash;&gt;-->
 <!--        <property name="connection.pool_size">3</property>-->
 <!--        &lt;!&ndash;property name="dialect">org.hibernate.dialect.MySQLDialect</property&ndash;&gt;-->
 <!--        <property name="current_session_context_class">thread</property>-->
