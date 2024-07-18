@@ -1,4 +1,4 @@
-package ru.gb.homework4.entity;
+package ru.gb.lesson4.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
