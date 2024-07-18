@@ -14,9 +14,9 @@ public class Main {
      * Используя hibernate, создать таблицы:
      * 1. Post (публикация) (id, title)
      * 2. PostComment (комментарий к публикации) (id, text, post_id)
-     *
+     * <p>
      * Написать стандартные CRUD-методы: создание, загрузка, удаление.
-     *
+     * <p>
      * Доп. задания:
      * 1. * В сущностях post и postComment добавить поля timestamp с датами.
      * 2. * Создать таблицу users(id, name) и в сущностях post и postComment добавить ссылку на юзера.
@@ -26,8 +26,8 @@ public class Main {
      * 3.3 ** Загрузить все комментарии по идентификатору юзера
      * 3.4 **** По идентификатору юзера загрузить юзеров, под чьими публикациями он оставлял комменты.
      * // userId -> List<User>
-     *
-     *
+     * <p>
+     * <p>
      * Замечание:
      * 1. Можно использовать ЛЮБУЮ базу данных (например, h2)
      * 2. Если запутаетесь, приходите в группу в телеграме или пишите мне @inchestnov в личку.
@@ -36,7 +36,7 @@ public class Main {
     public static void main(String[] args) {
         Configuration configuration = new Configuration();
         configuration.configure();
-        try(SessionFactory sessionFactory = configuration.buildSessionFactory()){
+        try (SessionFactory sessionFactory = configuration.buildSessionFactory()) {
 //            sessionCreate(sessionFactory);
 //            sessionUpdate(sessionFactory);
 //            sessionDelete(sessionFactory);
@@ -44,13 +44,16 @@ public class Main {
         }
     }
 
-private static void withSession(SessionFactory sessionFactory){
-        try (Session session = sessionFactory.openSession()){
-            PostComment postComment = session.find(PostComment.class, 1L);
-            System.out.println(postComment);
+    private static void withSession(SessionFactory sessionFactory) {
+        try (Session session = sessionFactory.openSession()) {
+            Post post = session.find(Post.class, 1L);
+            System.out.println(post);
 
+            for (PostComment postComment : post.getPostComments()) {
+                System.out.println(postComment);
+            }
         }
-}
+    }
 
     private static void sessionCreate(SessionFactory sessionFactory) {
 
@@ -64,19 +67,19 @@ private static void withSession(SessionFactory sessionFactory){
         }
     }
 
-private static void sessionUpdate(SessionFactory sessionFactory) {
-    try (Session session = sessionFactory.openSession()) {
-        Post toUpdate = session.find(Post.class, 17L);
-        toUpdate.setTitle("TITLE UPDATED");
+    private static void sessionUpdate(SessionFactory sessionFactory) {
+        try (Session session = sessionFactory.openSession()) {
+            Post toUpdate = session.find(Post.class, 17L);
+            toUpdate.setTitle("TITLE UPDATED");
 
-        Transaction tx = session.beginTransaction();
-        session.merge(toUpdate);  // update
-        tx.commit();
+            Transaction tx = session.beginTransaction();
+            session.merge(toUpdate);  // update
+            tx.commit();
+        }
     }
-}
 
-private static void sessionDelete(SessionFactory sessionFactory){
-        try (Session session = sessionFactory.openSession()){
+    private static void sessionDelete(SessionFactory sessionFactory) {
+        try (Session session = sessionFactory.openSession()) {
             PostComment toDelete = session.find(PostComment.class, 1L);
 
             Transaction tx = session.beginTransaction();

@@ -1,9 +1,8 @@
 package ru.gb.lesson4.homework4.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
+import java.util.List;
 
 @Entity
 @Table(name = "post")
@@ -14,6 +13,17 @@ public class Post {
 
     @Column(name = "title")
     private String title;
+
+    @OneToMany(mappedBy = "post")
+    private List<PostComment> postComments;
+
+    public List<PostComment> getPostComments() {
+        return postComments;
+    }
+
+    public void setPostComments(List<PostComment> postComments) {
+        this.postComments = postComments;
+    }
 
     public Post() {
     }
@@ -39,6 +49,7 @@ public class Post {
         return "Post{" +
                 "id=" + id +
                 ", title='" + title + '\'' +
+                ", postComments=" + postComments +
                 '}';
     }
 }

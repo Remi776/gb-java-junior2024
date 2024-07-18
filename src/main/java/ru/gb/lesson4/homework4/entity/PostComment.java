@@ -49,7 +49,7 @@ public class PostComment {
         return "PostComment{" +
                 "id=" + id +
                 ", text='" + text + '\'' +
-                ", post=" + post +
+//                ", post=" + post +
                 '}';
     }
 }
