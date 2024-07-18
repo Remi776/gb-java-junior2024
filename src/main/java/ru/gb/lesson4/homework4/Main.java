@@ -38,10 +38,19 @@ public class Main {
         configuration.configure();
         try(SessionFactory sessionFactory = configuration.buildSessionFactory()){
 //            sessionCreate(sessionFactory);
-            sessionUpdate(sessionFactory);
-            sessionDelete(sessionFactory);
+//            sessionUpdate(sessionFactory);
+//            sessionDelete(sessionFactory);
+            withSession(sessionFactory);
         }
     }
+
+private static void withSession(SessionFactory sessionFactory){
+        try (Session session = sessionFactory.openSession()){
+            PostComment postComment = session.find(PostComment.class, 1L);
+            System.out.println(postComment);
+
+        }
+}
 
     private static void sessionCreate(SessionFactory sessionFactory) {
 
