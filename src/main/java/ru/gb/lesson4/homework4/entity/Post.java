@@ -1,7 +1,18 @@
-package ru.gb.lesson4.homework4;
+package ru.gb.lesson4.homework4.entity;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "post")
 public class Post {
+    @Id
+    @Column(name = "id")
     private Long id;
+
+    @Column(name = "title")
     private String title;
 
     public Post() {

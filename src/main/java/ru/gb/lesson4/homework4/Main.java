@@ -1,5 +1,14 @@
 package ru.gb.lesson4.homework4;
 
+
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.cfg.Configuration;
+import ru.gb.lesson4.homework4.entity.Post;
+import ru.gb.lesson4.homework4.entity.PostComment;
+
+
 public class Main {
     /**
      * Используя hibernate, создать таблицы:
@@ -25,6 +34,45 @@ public class Main {
      */
 
     public static void main(String[] args) {
+        Configuration configuration = new Configuration();
+        configuration.configure();
+        try(SessionFactory sessionFactory = configuration.buildSessionFactory()){
+//            sessionCreate(sessionFactory);
+            sessionUpdate(sessionFactory);
+            sessionDelete(sessionFactory);
+        }
+    }
 
+    private static void sessionCreate(SessionFactory sessionFactory) {
+
+        try (Session session = sessionFactory.openSession()) {
+            Transaction tx = session.beginTransaction();
+            Post post = new Post();
+            post.setId(17L);
+            post.setTitle("Post #17");
+            session.persist(post);
+            tx.commit();
+        }
+    }
+
+private static void sessionUpdate(SessionFactory sessionFactory) {
+    try (Session session = sessionFactory.openSession()) {
+        Post toUpdate = session.find(Post.class, 17L);
+        toUpdate.setTitle("TITLE UPDATED");
+
+        Transaction tx = session.beginTransaction();
+        session.merge(toUpdate);  // update
+        tx.commit();
+    }
+}
+
+private static void sessionDelete(SessionFactory sessionFactory){
+        try (Session session = sessionFactory.openSession()){
+            PostComment toDelete = session.find(PostComment.class, 1L);
+
+            Transaction tx = session.beginTransaction();
+            session.remove(toDelete); // delete
+            tx.commit();
+        }
     }
 }

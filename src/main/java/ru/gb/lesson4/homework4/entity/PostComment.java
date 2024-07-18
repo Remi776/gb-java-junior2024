@@ -1,9 +1,21 @@
-package ru.gb.lesson4.homework4;
+package ru.gb.lesson4.homework4.entity;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "post_comment")
 public class PostComment {
+
+    @Id
+    @Column(name = "id")
     private Long id;
+
+    @Column(name = "text")
     private String text;
-    private Long post_id;
+
+    @ManyToOne
+    @JoinColumn(name = "post_id", nullable = false)
+    private Post post;
 
     public PostComment() {
     }
@@ -24,12 +36,12 @@ public class PostComment {
         this.text = text;
     }
 
-    public Long getPost_id() {
-        return post_id;
+    public Post getPost() {
+        return post;
     }
 
-    public void setPost_id(Long post_id) {
-        this.post_id = post_id;
+    public void setPost(Post post) {
+        this.post = post;
     }
 
     @Override
@@ -37,7 +49,7 @@ public class PostComment {
         return "PostComment{" +
                 "id=" + id +
                 ", text='" + text + '\'' +
-                ", post_id=" + post_id +
+                ", post=" + post +
                 '}';
     }
 }
