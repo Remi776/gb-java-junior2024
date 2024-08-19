@@ -153,9 +153,7 @@ public class Homework {
                 .collect(Collectors.toMap(
                         p -> p.getDepart().getName(),
                         p -> p,
-                        (p1, p2) -> {
-                            return p1.getAge() > p2.getAge() ? p1 : p2;
-                        }
+                        (p1, p2) -> p1.getAge() > p2.getAge() ? p1 : p2
                 ));
     }
 
