@@ -1,4 +1,4 @@
-package src.main.java.ru.gb.homework3;
+package ru.gb.lesson3.homework;
 
 import java.sql.*;
 import java.util.ArrayList;

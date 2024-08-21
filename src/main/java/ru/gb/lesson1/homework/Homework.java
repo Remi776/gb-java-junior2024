@@ -1,4 +1,4 @@
-package ru.gb.lesson1.homework1;
+package ru.gb.lesson1.homework;
 
 
 import java.util.*;
@@ -164,7 +164,8 @@ public class Homework {
     static List<Person> minSalaryInDepartment(List<Person> people) {
         return people.stream()
                 .filter(Objects::nonNull)
-                .collect(Collectors.groupingBy(Person::getDepart,
+                .collect(Collectors.groupingBy(
+                        Person::getDepart,
                         Collectors.minBy(Comparator.comparing(Person::getSalary))))
                 .values().stream()
                 .flatMap(Optional::stream)
