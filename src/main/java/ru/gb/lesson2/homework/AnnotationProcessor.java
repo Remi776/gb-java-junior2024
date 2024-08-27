@@ -6,7 +6,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class AnnotationProcessor {
@@ -38,10 +37,11 @@ public class AnnotationProcessor {
 
     private static void setFieldValue(Field field, Object obj, Class<?> fieldType, long randomTime, ZoneId zoneId) throws IllegalAccessException {
         field.setAccessible(true);
+        Instant instantTime = Instant.ofEpochMilli(randomTime);
         switch (fieldType.getSimpleName()) {
-            case "Instant" -> field.set(obj, Instant.ofEpochMilli(randomTime));
-            case "LocalDateTime" -> field.set(obj, Instant.ofEpochMilli(randomTime).atZone(zoneId).toLocalDateTime());
-            case "LocalDate" -> field.set(obj, Instant.ofEpochMilli(randomTime).atZone(zoneId).toLocalDate());
+            case "Instant" -> field.set(obj, instantTime);
+            case "LocalDateTime" -> field.set(obj, LocalDateTime.ofInstant(instantTime, zoneId));
+            case "LocalDate" -> field.set(obj, LocalDate.ofInstant(instantTime, zoneId));
             case "Date" -> field.set(obj, new Date(randomTime));
         }
     }
