@@ -6,7 +6,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ChatServer {
     private final static ObjectMapper objectMapper = new ObjectMapper();
@@ -34,6 +36,7 @@ public class ChatServer {
      */
 
     public static void main(String[] args) {
+        Map<String, ClientHandler> clients = new ConcurrentHashMap<>();
         try (ServerSocket serverSocket = new ServerSocket(8888)) {
             System.out.println("Server has been started.");
 
@@ -41,7 +44,7 @@ public class ChatServer {
             mainLoop:
             while (true) {
                 Socket client = serverSocket.accept();
-                ClientHandler clientHandler = new ClientHandler(client);
+                ClientHandler clientHandler = new ClientHandler(client, clients);
                 new Thread(clientHandler).start();
             }
         } catch (IOException e) {
@@ -52,10 +55,12 @@ public class ChatServer {
     private static class ClientHandler implements Runnable {
 
         private final Socket client;
+        private final Map<String, ClientHandler> clients;
         private String clientLogin;
 
-        public ClientHandler(Socket client) {
+        public ClientHandler(Socket client, Map<String, ClientHandler> clients) {
             this.client = client;
+            this.clients = clients;
         }
 
         @Override
@@ -66,9 +71,16 @@ public class ChatServer {
                  PrintWriter out = new PrintWriter(client.getOutputStream(), true)) {
                 String loginRequest = in.nextLine();
                 this.clientLogin = readLoginFromLoginRequest(loginRequest);
+                System.out.println("Request from the client: " + clientLogin);
 
-                String loginResponse = createLoginResponse(true);
-                out.println(loginResponse);
+                if (clients.containsKey(clientLogin)) {
+                    String unsuccessfulResponse = createLoginResponse(false);
+                    out.println(unsuccessfulResponse);
+                    doClose();
+                }
+                clients.put(clientLogin, this);
+                String successfulLoginResponse = createLoginResponse(true);
+                out.println(successfulLoginResponse);
 
                 clientLoop:
                 while (true) {
@@ -82,12 +94,16 @@ public class ChatServer {
                 }
             } catch (IOException e) {
                 System.err.println("Error during connection to the client: " + e.getMessage());
-            } finally {
-                try {
-                    client.close();
-                } catch (IOException e) {
-                    System.err.println("Error during disconnection from the server: " + e.getMessage());
-                }
+            }
+
+            doClose();
+        }
+
+        private void doClose() {
+            try {
+                client.close();
+            } catch (IOException e) {
+                System.err.println("Error during disconnection from the server: " + e.getMessage());
             }
         }
 

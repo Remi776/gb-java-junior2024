@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.time.Duration;
 import java.util.Scanner;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
@@ -14,8 +15,8 @@ public class ChatClient {
     private static ObjectMapper objectMapper = new ObjectMapper();
 
     public static void main(String[] args) {
-        String clientLogin = "User_" + UUID.randomUUID();
-
+//        String clientLogin = "User_" + UUID.randomUUID();
+        String clientLogin = "admin";
         try (Socket server = new Socket("localhost", 8888)) {
             System.out.println("Connected to server!");
             try (Scanner in = new Scanner(server.getInputStream());
@@ -29,6 +30,8 @@ public class ChatClient {
                     System.out.println("Failed to connect to the server");
                     return;
                 }
+
+                sleep();
 
 //                String msgFromServer = loginResponseString;
 //                System.out.println("Message from server: " + msgFromServer);
@@ -67,6 +70,15 @@ public class ChatClient {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e.getMessage());
         }
+    }
+
+    private static void sleep() {
+        try {
+            Thread.sleep(Duration.ofMinutes(5));
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 }
 
