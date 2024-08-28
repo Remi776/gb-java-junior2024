@@ -3,6 +3,7 @@ package ru.gb.lesson5;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ru.gb.lesson5.hw.BroadcastMessageRequest;
+import ru.gb.lesson5.hw.DisconnectRequest;
 import ru.gb.lesson5.hw.UsersRequest;
 
 import java.io.IOException;
@@ -27,7 +28,6 @@ public class ChatClient {
 
         // 127.0.0.1 или localhost
         try (Socket server = new Socket("localhost", 8888)) {
-            System.out.println("Успешно подключились к серверу");
 
             try (PrintWriter out = new PrintWriter(server.getOutputStream(), true)) {
                 Scanner in = new Scanner(server.getInputStream());
@@ -36,7 +36,9 @@ public class ChatClient {
                 out.println(loginRequest);
 
                 String loginResponseString = in.nextLine();
-                if (!checkLoginResponse(loginResponseString)) {
+                if (checkLoginResponse(loginResponseString)) {
+                    System.out.println("Успешно подключились к серверу");
+                } else {
                     // TODO: Можно обогатить причиной, чтобы клиент получал эту причину
                     // (логин уже занят, ошибка аутентификации\авторизации, ...)
                     System.out.println("Не удалось подключиться к серверу");
@@ -55,17 +57,23 @@ public class ChatClient {
                     while (true) {
                         // TODO: парсим сообщение в AbstractRequest
                         //  по полю type понимаем, что это за request, и обрабатываем его нужным образом
-                        String msgFromServer = in.nextLine();
-                        System.out.println("Сообщение от сервера: " + msgFromServer);
+                        try {
+                            String msgFromServer = in.nextLine();
+                            System.out.println("Сообщение от сервера: " + msgFromServer);
+                        } catch (NoSuchElementException ignored) {
+                            System.err.println("Отключились от сервера.");
+                            break;
+                        }
                     }
                 }).start();
 
-
+                mainLoop:
                 while (true) {
                     System.out.println("Что хочу сделать?");
                     System.out.println("1. Послать сообщение другу");
                     System.out.println("2. Послать сообщение всем пользователям");
                     System.out.println("3. Получить список логинов");
+                    System.out.println("4. Отключиться от сервера");
 
                     String type = console.nextLine();
 
@@ -90,6 +98,12 @@ public class ChatClient {
                             UsersRequest request = new UsersRequest();
                             String sendMsgRequest = objectMapper.writeValueAsString(request);
                             out.println(sendMsgRequest);
+                        }
+                        case "4" -> {
+                            DisconnectRequest request = new DisconnectRequest();
+                            String sendMsgRequest = objectMapper.writeValueAsString(request);
+                            out.println(sendMsgRequest);
+                            break mainLoop;
                         }
                     }
 //          if (type.equals("1")) {
@@ -122,7 +136,7 @@ public class ChatClient {
             System.err.println("Ошибка во время подключения к серверу: " + e.getMessage());
         }
 
-        System.out.println("Отключились от сервера");
+//        System.out.println("Отключились от сервера");
     }
 
     private static String createLoginRequest(String login) {

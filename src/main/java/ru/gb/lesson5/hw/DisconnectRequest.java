@@ -1,13 +1,11 @@
 package ru.gb.lesson5.hw;
 
-public class DisconnectRequest {
-    private boolean connected;
+import ru.gb.lesson5.AbstractRequest;
 
-    public boolean isConnected() {
-        return connected;
-    }
+public class DisconnectRequest extends AbstractRequest {
+    public static final String TYPE = "disconnectRequest";
 
-    public void setConnected(boolean connected) {
-        this.connected = connected;
+    public DisconnectRequest() {
+        setType(TYPE);
     }
 }

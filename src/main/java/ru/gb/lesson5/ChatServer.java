@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ru.gb.lesson5.hw.BroadcastMessageRequest;
+import ru.gb.lesson5.hw.DisconnectRequest;
 import ru.gb.lesson5.hw.UsersRequest;
 
 import java.io.IOException;
@@ -15,6 +16,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 public class ChatServer {
 
@@ -138,7 +140,7 @@ public class ChatServer {
                     }
                     clientTo.sendMessage(request.getMessage());
 
-                } else if (BroadcastMessageRequest.TYPE.equals(type)) { // BroadcastRequest.TYPE.equals(type)
+                } else if (BroadcastMessageRequest.TYPE.equals(type)) {        // BroadcastRequest.TYPE.equals(type)
 
                     // TODO: Читать остальные типы сообщений
                     final BroadcastMessageRequest request;
@@ -154,10 +156,19 @@ public class ChatServer {
                         continue;
                     }
 
-                } else if (UsersRequest.TYPE.equals(type)) { // UsersRequest.TYPE.equals(type)
-                    clients.keySet().stream()
+                } else if (UsersRequest.TYPE.equals(type)) {        // UsersRequest.TYPE.equals(type)
+                    sendMessage(clients.keySet().stream()
                             .filter(login -> !login.equals(clientLogin))
-                            .forEach(this::sendMessage);
+                            .collect(Collectors.joining(", ")));
+
+                } else if (DisconnectRequest.TYPE.equals(type)) {       // DisconnectRequest.TYPE.equals(type)
+                    System.out.printf("[%s] disconnected", clientLogin);
+                    clients.remove(clientLogin);
+                    clients.values().stream()
+                            .filter(Objects::nonNull)
+                            .forEach(clientTo -> clientTo.sendMessage("клиент [" + clientLogin + "] disconnected from server"));
+                    break;
+
                 } else {
                     System.err.println("Неизвестный тип сообщения: " + type);
                     sendMessage("Неизвестный тип сообщения: " + type);
@@ -165,7 +176,7 @@ public class ChatServer {
                 }
             }
 
-//            doClose();
+            doClose();
         }
 
         private void doClose() {
