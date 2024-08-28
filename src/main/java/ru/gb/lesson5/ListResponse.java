@@ -1,4 +1,4 @@
-package ru.gb.lesson5.lecture;
+package ru.gb.lesson5;
 
 import java.util.List;
 
@@ -18,13 +18,14 @@ import java.util.List;
  * }
  */
 public class ListResponse {
-    private List<User> users;
 
-    public List<User> getUsers() {
-        return users;
-    }
+  private List<User> users;
 
-    public void setUsers(List<User> users) {
-        this.users = users;
-    }
+  public List<User> getUsers() {
+    return users;
+  }
+
+  public void setUsers(List<User> users) {
+    this.users = users;
+  }
 }

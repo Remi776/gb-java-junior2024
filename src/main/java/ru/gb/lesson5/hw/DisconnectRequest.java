@@ -1,11 +1,6 @@
-package ru.gb.lesson5.lecture;
+package ru.gb.lesson5.hw;
 
-/**
- * {
- *     "connected": true
- * }
- */
-public class LoginResponse {
+public class DisconnectRequest {
     private boolean connected;
 
     public boolean isConnected() {
