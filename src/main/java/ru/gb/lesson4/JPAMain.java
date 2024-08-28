@@ -7,7 +7,7 @@ import org.hibernate.cfg.Configuration;
 import ru.gb.lesson4.entity.Author;
 import ru.gb.lesson4.entity.Book;
 
-public class JPA {
+public class JPAMain {
     public static void main(String[] args) {
 
         Configuration configuration = new Configuration();

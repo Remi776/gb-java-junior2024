@@ -13,11 +13,11 @@
         <!-- none, create, create-drop, update, validate-->
         <property name="hibernate.hbm2ddl.auto">validate</property>
 
-<!--        <mapping class="ru.gb.lesson4.homework4.entity.Post"/>-->
-<!--        <mapping class="ru.gb.lesson4.homework4.entity.PostComment"/>-->
+        <mapping class="ru.gb.lesson4.homework4.entity.Post"/>
+        <mapping class="ru.gb.lesson4.homework4.entity.PostComment"/>
 
-        <mapping class="ru.gb.lesson4.entity.Author"/>
-        <mapping class="ru.gb.lesson4.entity.Book"/>
+<!--        <mapping class="ru.gb.lesson4.entity.Author"/>-->
+<!--        <mapping class="ru.gb.lesson4.entity.Book"/>-->
 
 
 
