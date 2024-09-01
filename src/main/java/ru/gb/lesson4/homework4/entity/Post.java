@@ -2,10 +2,13 @@ package ru.gb.lesson4.homework4.entity;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Set;
 
 @Entity
-@Table(name = "post")
+@Table(name = "posts")
 public class Post {
     @Id
     @Column(name = "id")
@@ -14,18 +17,48 @@ public class Post {
     @Column(name = "title")
     private String title;
 
-    @OneToMany(mappedBy = "post")
-    private List<PostComment> postComments;
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-    public List<PostComment> getPostComments() {
+    @OneToMany(mappedBy = "post")
+    private Set<PostComment> postComments;
+
+    @Column(name = "created_at")
+    private String createdAt;
+
+    @PrePersist
+    protected void onCreate(){
+        LocalDateTime dateTime = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        createdAt = dateTime.format(formatter);
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Set<PostComment> getPostComments() {
         return postComments;
     }
 
-    public void setPostComments(List<PostComment> postComments) {
+    public void setPostComments(Set<PostComment> postComments) {
         this.postComments = postComments;
     }
 
     public Post() {
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public Long getId() {
@@ -44,12 +77,12 @@ public class Post {
         this.title = title;
     }
 
+
     @Override
     public String toString() {
         return "Post{" +
                 "id=" + id +
                 ", title='" + title + '\'' +
-                ", postComments=" + postComments +
                 '}';
     }
 }

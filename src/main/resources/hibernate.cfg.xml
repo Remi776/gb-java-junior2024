@@ -9,24 +9,32 @@
         <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
         <property name="hibernate.connection.username">postgres</property>
         <property name="hibernate.connection.password">pass</property>
+
+        <!--        пример: Hibernate: select p1_0.id,p1_0.title from post p1_0 where p1_0.id=?-->
         <property name="show_sql">true</property>
-        <!-- none, create, create-drop, update, validate-->
+
+        <!-- none,
+         create(дропает если существует и создает новую схему),
+         create-drop(создает и после дропает схему),
+         update(если есть разница в схемах, накатывает обновление),
+         validate(сверяет схемы бд с сущностью java)-->
+        <!--        validate, create-drop самые часто используемые-->
         <property name="hibernate.hbm2ddl.auto">validate</property>
 
         <mapping class="ru.gb.lesson4.homework4.entity.Post"/>
         <mapping class="ru.gb.lesson4.homework4.entity.PostComment"/>
+        <mapping class="ru.gb.lesson4.homework4.entity.User"/>
 
-<!--        <mapping class="ru.gb.lesson4.entity.Author"/>-->
-<!--        <mapping class="ru.gb.lesson4.entity.Book"/>-->
+        <!--        <mapping class="ru.gb.lesson4.entity.Author"/>-->
+        <!--        <mapping class="ru.gb.lesson4.entity.Book"/>-->
 
 
-
- <!--        &lt;!&ndash; property name="connection.driver_class">com.mysql.jdbc.Driver</property &ndash;&gt;-->
-<!--        <property name="connection.pool_size">3</property>-->
-<!--        &lt;!&ndash;property name="dialect">org.hibernate.dialect.MySQLDialect</property&ndash;&gt;-->
-<!--        <property name="current_session_context_class">thread</property>-->
-<!--        <property name="show_sql">true</property>-->
-<!--        <property name="format_sql">true</property>-->
-<!--        <property name="hbm2ddl.auto">update</property>-->
+        <!--        &lt;!&ndash; property name="connection.driver_class">com.mysql.jdbc.Driver</property &ndash;&gt;-->
+        <!--        <property name="connection.pool_size">3</property>-->
+        <!--        &lt;!&ndash;property name="dialect">org.hibernate.dialect.MySQLDialect</property&ndash;&gt;-->
+        <!--        <property name="current_session_context_class">thread</property>-->
+        <!--        <property name="show_sql">true</property>-->
+        <!--        <property name="format_sql">true</property>-->
+        <!--        <property name="hbm2ddl.auto">update</property>-->
     </session-factory>
 </hibernate-configuration>
