@@ -61,6 +61,7 @@ public class Main {
 
             user.getPostComments().stream()
                     .map(PostComment::getPost)
+                    .distinct()
                     .collect(Collectors.groupingBy(Post::getUser))
                     .forEach((userKey, posts) -> System.out.println(userKey + ": " + posts));
         }
